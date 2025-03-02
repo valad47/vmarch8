@@ -25,6 +25,18 @@ int main(int argc, char **argv) {
             show_fps = true;
             continue;
         }
+        if(!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
+            printf(
+            "Usage: vmarch8 [flags]\n"
+            "\n"
+            "Flags:\n"
+            "\t-h, --help\t- print this message\n"
+            "\t--debug\t\t- enable debug information\n"
+            "\t--show-fps\t- show fps\n"
+            "\t--fps=<int>\t- set program FPS (default is inf)\n"
+            );
+            return 0;
+        }
 
         printf("[" TEXT_YELLOW "WARNING" TEXT_DEFAULT "] Got unexpected argument " TEXT_LIGHTBLUE "%s" TEXT_DEFAULT "\n", argv[i]);
     }
