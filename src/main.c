@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 bool debug_mode = false;
@@ -42,17 +43,21 @@ int main(int argc, char **argv) {
     }
 
     SetTraceLogLevel(debug_mode ? LOG_ALL : LOG_NONE);
+
     InitWindow(800, 400, "vmarch8");
     SetTargetFPS(fps);
-
+    Font font = LoadFont("resources/dejavu.fnt");
 
     while(!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(WHITE);
         show_fps ? DrawFPS(5, 5) : true;
 
+        DrawTextEx(font, "Я тебе кохаю <3", (Vector2){350, 200}, 40, 0, RED);
+
         EndDrawing();
     }
 
+    UnloadFont(font);
     CloseWindow();
 }
