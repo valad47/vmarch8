@@ -15,6 +15,7 @@ int fps = 60;
 
 typedef struct Object {
     Vector2 position;
+    bool visible;
     void* data;
     int speed;
     void (*draw)(struct Object* obj);
@@ -53,8 +54,9 @@ void insert(Array* array, void* data);
 void args(int argc, char ** argv);
 
 void text_draw(Object *obj) {
+    if(!obj->visible) return;
     TextLabel *tl = (TextLabel*)obj->data;
-    DrawTextEx(tl->font, tl->str, obj->position, tl->size, 0, tl->color);
+    DrawTextEx(tl->font, tl->str, obj->position, tl->size, 1, tl->color);
 }
 
 void rain(Object *obj) {
@@ -77,30 +79,35 @@ int main(int argc, char **argv) {
 
     InitWindow(800, 400, "vmarch8");
     SetTargetFPS(fps);
-    Font font = LoadFont("resources/dejavu.fnt");
+    int codepoints[512] = { 0 };
+    for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;   // Basic ASCII characters
+    for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i;   // Cyrillic characters
+    Font font = LoadFontEx("resources/Bebas_Neue_Cyrillic.ttf", 32, codepoints, 512);
 
     Array *objects = new_array(Object);
-    for(int i = 0; i < 64; i++)
+    for(int i = 0; i < 42; i++)
     insert(objects, &(Object){
         .position = {350, 200},
         .data = &(TextLabel) {
             "Я тебе люблю <3",
-            20,
+            32,
             font,
-            RED,
+            PINK,
         },
         .draw = rain,
-        .speed = 1+(rand() % 4)
+        .speed = 1+(rand() % 4),
+        .visible = true
     });
     insert(objects, &(Object){
         .position = {350, 100},
         .data = &(TextLabel) {
-            "Чингискан наступає з сєвєра",
-            20,
+            "Чингисхан наступає з сєвєра",
+            32,
             font,
             RED
         },
-        .draw = rain
+        .draw = rain,
+        .visible = true
     });
 
     while(!WindowShouldClose()) {
