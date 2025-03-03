@@ -12,7 +12,36 @@ int fps = 0;
 #define TEXT_YELLOW "\033[33m"
 #define TEXT_LIGHTBLUE "\033[94m"
 
+typedef struct Object {
+    Vector2 position;
+    void* data;
+    void (*draw)(struct Object* obj);
+} Object;
+
+typedef struct TextLabel {
+    char *str;
+    int size;
+    Font font;
+    Color color;
+    bool resize;
+} TextLabel;
+
 void args(int argc, char ** argv);
+
+void text_draw(Object *obj) {
+    TextLabel *tl = (TextLabel*)obj->data;
+    DrawTextEx(tl->font, tl->str, obj->position, tl->size, 0, tl->color);
+}
+
+void pulse(Object *obj) {
+    TextLabel *tl = (TextLabel*)obj->data;
+    if(tl->resize && (tl->size++) == 30) {
+        tl->resize = false;
+    } else if(!tl->resize && (tl->size--) == 20) {
+        tl->resize = true;
+    }
+    text_draw(obj);
+}
 
 int main(int argc, char **argv) {
     args(argc, argv);
@@ -23,12 +52,37 @@ int main(int argc, char **argv) {
     SetTargetFPS(fps);
     Font font = LoadFont("resources/dejavu.fnt");
 
+    Object objects[] = {
+        {
+            .position = {350, 200},
+            .data = &(TextLabel) {
+                "Я тебе люблю <3",
+                20,
+                font,
+                RED
+            },
+            .draw = text_draw
+        },
+        {
+            .position = {350, 100},
+            .data = &(TextLabel) {
+                "Чингискан наступає з сєвєра",
+                20,
+                font,
+                RED
+            },
+            .draw = pulse
+        }
+    };
+
     while(!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(WHITE);
         show_fps ? DrawFPS(5, 5) : true;
 
-        DrawTextEx(font, "Я тебе кохаю <3", (Vector2){350, 200}, 14, 0, BLACK);
+        for(int i = 0; i < sizeof(objects) / sizeof(Object); i++) {
+            objects[i].draw(&objects[i]);
+        }
 
         EndDrawing();
     }
