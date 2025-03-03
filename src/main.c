@@ -12,7 +12,32 @@ int fps = 0;
 #define TEXT_YELLOW "\033[33m"
 #define TEXT_LIGHTBLUE "\033[94m"
 
+void args(int argc, char ** argv);
+
 int main(int argc, char **argv) {
+    args(argc, argv);
+
+    SetTraceLogLevel(debug_mode ? LOG_ALL : LOG_NONE);
+
+    InitWindow(800, 400, "vmarch8");
+    SetTargetFPS(fps);
+    Font font = LoadFont("resources/dejavu.fnt");
+
+    while(!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(WHITE);
+        show_fps ? DrawFPS(5, 5) : true;
+
+        DrawTextEx(font, "Я тебе кохаю <3", (Vector2){350, 200}, 14, 0, BLACK);
+
+        EndDrawing();
+    }
+
+    UnloadFont(font);
+    CloseWindow();
+}
+
+void args(int argc, char **argv) {
     for(int i = 1; i < argc; i++) {
         if(!strcmp("--debug", argv[i])) {
             debug_mode = true;
@@ -36,28 +61,8 @@ int main(int argc, char **argv) {
             "\t--show-fps\t- show fps\n"
             "\t--fps=<int>\t- set program FPS (default is inf)\n"
             );
-            return 0;
+            exit(0);
         }
-
         printf("[" TEXT_YELLOW "WARNING" TEXT_DEFAULT "] Got unexpected argument " TEXT_LIGHTBLUE "%s" TEXT_DEFAULT "\n", argv[i]);
     }
-
-    SetTraceLogLevel(debug_mode ? LOG_ALL : LOG_NONE);
-
-    InitWindow(800, 400, "vmarch8");
-    SetTargetFPS(fps);
-    Font font = LoadFont("resources/dejavu.fnt");
-
-    while(!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(WHITE);
-        show_fps ? DrawFPS(5, 5) : true;
-
-        DrawTextEx(font, "Я тебе кохаю <3", (Vector2){350, 200}, 40, 0, RED);
-
-        EndDrawing();
-    }
-
-    UnloadFont(font);
-    CloseWindow();
 }
