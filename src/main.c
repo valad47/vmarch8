@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "raymath.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -23,7 +24,7 @@ typedef struct Object {
 
 typedef struct TextLabel {
     char *str;
-    int size;
+    float size;
     Font font;
     Color color;
     bool resize;
@@ -70,6 +71,18 @@ void rain(Object *obj) {
     text_draw(obj);
 }
 
+void center_pulse(Object *obj) {
+    TextLabel *tl = (TextLabel*)obj->data;
+    if(tl->resize && (tl->size+=.3)>=42)
+        tl->resize = false;
+    else if(!tl->resize && (tl->size-=.3)<=32)
+        tl->resize = true;
+
+    obj->position = Vector2Subtract((Vector2){400, 200}, Vector2Scale(MeasureTextEx(tl->font, tl->str, tl->size, 1), .5));
+
+    text_draw(obj);
+}
+
 int main(int argc, char **argv) {
     args(argc, argv);
 
@@ -106,7 +119,7 @@ int main(int argc, char **argv) {
             font,
             RED
         },
-        .draw = rain,
+        .draw = center_pulse,
         .visible = true
     });
 
