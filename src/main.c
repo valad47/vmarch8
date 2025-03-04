@@ -83,6 +83,8 @@ void center_pulse(Object *obj) {
     text_draw(obj);
 }
 
+Font load_font(int fontSize);
+
 int main(int argc, char **argv) {
     args(argc, argv);
 
@@ -92,10 +94,8 @@ int main(int argc, char **argv) {
 
     InitWindow(800, 400, "vmarch8");
     SetTargetFPS(fps);
-    int codepoints[512] = { 0 };
-    for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;   // Basic ASCII characters
-    for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i;   // Cyrillic characters
-    Font font = LoadFontEx("resources/Bebas_Neue_Cyrillic.ttf", 32, codepoints, 512);
+
+    Font font = load_font(32);
 
     Array *objects = new_array(Object);
     for(int i = 0; i < 42; i++)
@@ -182,4 +182,14 @@ void insert(Array* array, void* data) {
     memcpy((array->array + ((array->length) * array->obj_size)), data, array->obj_size);
     array->length++;
     debug("[" TEXT_LIGHTBLUE "%p" TEXT_DEFAULT "]: New object [" TEXT_YELLOW "%p" TEXT_DEFAULT "]\n", array, data);
+}
+
+Font load_font(int fontSize) {
+    int codepoints[512] = { 0 };
+    for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;   // Basic ASCII characters
+    for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i;   // Cyrillic characters
+    const unsigned char font_raw[] = {
+        #embed "../resources/Bebas_Neue_Cyrillic.ttf"
+    };
+    return LoadFontFromMemory(".ttf", font_raw, sizeof(font_raw), fontSize, codepoints, 512);
 }
