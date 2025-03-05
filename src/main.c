@@ -54,36 +54,11 @@ void insert(Array* array, void* data);
 
 void args(int argc, char ** argv);
 
-void text_draw(Object *obj) {
-    if(!obj->visible) return;
-    TextLabel *tl = (TextLabel*)obj->data;
-    DrawTextEx(tl->font, tl->str, obj->position, tl->size, 1, tl->color);
-}
+void text_draw(Object *obj);
+void rain(Object *obj);
+void center_pulse(Object *obj);
 
-void rain(Object *obj) {
-    TextLabel *tl = (TextLabel*)obj->data;
-    if((obj->position.y += obj->speed) >= GetRenderHeight()) {
-        obj->position.y = -40;
-        obj->position.x = rand() % 800;
-        obj->speed = (rand() % 4) + 1;
-    };
-
-    text_draw(obj);
-}
-
-void center_pulse(Object *obj) {
-    TextLabel *tl = (TextLabel*)obj->data;
-    if(tl->resize && (tl->size+=.3)>=42)
-        tl->resize = false;
-    else if(!tl->resize && (tl->size-=.3)<=32)
-        tl->resize = true;
-
-    obj->position = Vector2Subtract((Vector2){400, 200}, Vector2Scale(MeasureTextEx(tl->font, tl->str, tl->size, 1), .5));
-
-    text_draw(obj);
-}
-
-Font load_font(int fontSize);
+Font load_font(float fontSize);
 
 int main(int argc, char **argv) {
     args(argc, argv);
@@ -143,6 +118,35 @@ int main(int argc, char **argv) {
     CloseWindow();
 }
 
+void text_draw(Object *obj) {
+    if(!obj->visible) return;
+    TextLabel *tl = (TextLabel*)obj->data;
+    DrawTextEx(tl->font, tl->str, obj->position, tl->size, 1, tl->color);
+}
+
+void rain(Object *obj) {
+    TextLabel *tl = (TextLabel*)obj->data;
+    if((obj->position.y += obj->speed) >= GetRenderHeight()) {
+        obj->position.y = -40;
+        obj->position.x = rand() % 800;
+        obj->speed = (rand() % 4) + 1;
+    };
+
+    text_draw(obj);
+}
+
+void center_pulse(Object *obj) {
+    TextLabel *tl = (TextLabel*)obj->data;
+    if(tl->resize && (tl->size+=.3)>=42)
+        tl->resize = false;
+    else if(!tl->resize && (tl->size-=.3)<=32)
+    tl->resize = true;
+
+    obj->position = Vector2Subtract((Vector2){400, 200}, Vector2Scale(MeasureTextEx(tl->font, tl->str, tl->size, 1), .5));
+
+    text_draw(obj);
+}
+
 void args(int argc, char **argv) {
     for(int i = 1; i < argc; i++) {
         if(!strcmp("--debug", argv[i])) {
@@ -184,7 +188,7 @@ void insert(Array* array, void* data) {
     debug("[" TEXT_LIGHTBLUE "%p" TEXT_DEFAULT "]: New object [" TEXT_YELLOW "%p" TEXT_DEFAULT "]\n", array, data);
 }
 
-Font load_font(int fontSize) {
+Font load_font(float fontSize) {
     int codepoints[512] = { 0 };
     for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;   // Basic ASCII characters
     for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i;   // Cyrillic characters
