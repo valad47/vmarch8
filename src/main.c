@@ -147,7 +147,7 @@ void appearing(Object *obj) {
     tl->mv.last_char2 = tl->str[tl->mv.pos+1];
     tl->str[tl->mv.pos] = '\0';
     tl->str[tl->mv.pos+1] = '\0';
-
+    obj->position = Vector2Subtract((Vector2){400, 200}, Vector2Scale(MeasureTextEx(tl->font, tl->str, tl->size, 1), .5));
     text_draw(obj);
 }
 
