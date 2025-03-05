@@ -22,12 +22,20 @@ typedef struct Object {
     void (*draw)(struct Object* obj);
 } Object;
 
+typedef struct {
+    int counter;
+    char last_char;
+    char last_char2;
+    int pos;
+} MovingLabel;
+
 typedef struct TextLabel {
     char *str;
     float size;
     Font font;
     Color color;
     bool resize;
+    MovingLabel mv;
 } TextLabel;
 
 typedef struct Array {
@@ -57,6 +65,7 @@ void args(int argc, char ** argv);
 void text_draw(Object *obj);
 void rain(Object *obj);
 void center_pulse(Object *obj);
+void appearing(Object *obj);
 
 Font load_font(float fontSize);
 
@@ -86,15 +95,16 @@ int main(int argc, char **argv) {
         .speed = 1+(rand() % 4),
         .visible = true
     });
+    char str[] = "Чингисхан наступає з сєвєра";
     insert(objects, &(Object){
         .position = {350, 100},
         .data = &(TextLabel) {
-            "Чингисхан наступає з сєвєра",
+            str,
             32,
             font,
             RED
         },
-        .draw = center_pulse,
+        .draw = appearing,
         .visible = true
     });
 
@@ -116,6 +126,29 @@ int main(int argc, char **argv) {
 
     UnloadFont(font);
     CloseWindow();
+}
+
+void appearing(Object *obj) {
+    TextLabel *tl = obj->data;
+    if(tl->mv.counter++ != 5) {
+        text_draw(obj);
+        return;
+    }
+    if(!tl->str[tl->mv.pos]) {
+        tl->str[tl->mv.pos] = tl->mv.last_char;
+        tl->str[tl->mv.pos+1] = tl->mv.last_char2;
+        tl->mv.last_char = '\0';
+        tl->mv.last_char2 = '\0';
+    }
+    if(!tl->str[tl->mv.pos]){text_draw(obj); return; }
+    tl->mv.counter = 0;
+    tl->mv.pos += 2;
+    tl->mv.last_char = tl->str[tl->mv.pos];
+    tl->mv.last_char2 = tl->str[tl->mv.pos+1];
+    tl->str[tl->mv.pos] = '\0';
+    tl->str[tl->mv.pos+1] = '\0';
+
+    text_draw(obj);
 }
 
 void text_draw(Object *obj) {
